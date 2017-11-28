@@ -10,7 +10,7 @@ try {
 
   console.log('MONGO: ', env.MONGO);
   console.log('SMTP: ', env.SMTP);
-//  console.log('DEBUG: ', env.DEBUG); // Error
+  console.log('DEBUG: ', env.DEBUG); // Error
 } catch(err) {
   console.error(err);
 }

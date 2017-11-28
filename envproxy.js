@@ -49,21 +49,22 @@ const handler = {
 };
 
 function EnvProxy(defaults) {
-  for (const key in defaults) {
-    if (defaults.hasOwnProperty(key)) {
-      const prop = defaults[key];
-      if (typeof prop !== 'object') {
-        defaults[key] = {
-          required: false,
-          default: prop,
-        }
+  // Normalize the defaults data
+  Object.keys(defaults).forEach((key) => {
+    const prop = defaults[key];
+    if (typeof prop !== 'object') {
+      defaults[key] = {
+        required: false,
+        default: prop,
       }
-      defaults[key].name = key;
     }
-  }
+    defaults[key].name = key;
+  });
 
+  // Verify that variables that are required are in process.env
   const env = process.env.NODE_ENV || 'development';
-  if (env !== 'development' && env !== 'dev') {
+  const isDevelopment = (env === 'development' || env === 'dev');
+  if (! isDevelopment) {
     const required = [];
     Object.keys(defaults).forEach((key) => {
       const prop = defaults[key];
@@ -75,6 +76,14 @@ function EnvProxy(defaults) {
       throw new EnvError('Required environment variables missing', required);
     }
   }
+
+  // Add values to process.env if they do not exist so other libraries can use
+  Object.keys(defaults).forEach((key) => {
+    const prop = defaults[key];
+    if (! process.env[key]) {
+      process.env[key] = defaults[key].default;
+    }
+  });
 
   return new Proxy(defaults, handler);
 }
