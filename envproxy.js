@@ -57,6 +57,10 @@ function EnvProxy(defaults) {
         required: false,
         default: prop,
       }
+    } else {
+      if (! defaults[key].default) {
+        throw new EnvError(`default value not provided for ${key}.  Example: ${key}: { default: 'some default' }`);
+      }
     }
     defaults[key].name = key;
   });
